@@ -1,0 +1,6 @@
+/var/log/promise/promise.log {
+   size 200M
+   copytruncate
+   rotate 7
+   compress
+}

@@ -1,0 +1,93 @@
+#!/usr/bin/python
+
+import setup
+import os
+import requests
+import subprocess
+setup.pre_install()
+
+from distutils.version import StrictVersion
+from charmhelpers import fetch
+from charmhelpers.core import hookenv
+
+def run_promise():
+    hookenv.log('Install git and setup promise work directory')
+    fetch.apt_install(fetch.filter_installed_packages(['git']))
+    if not os.path.exists("/usr/local/promise"):
+        os.makedirs("/usr/local/promise")
+    else:
+        hookenv.log('Promise work directory already exists. Backing up and setting up a new one')
+        os.system("mv /usr/local/promise /usr/local/promise.`/bin/date '+%Y%m%d-%H%M%S'`")
+        os.makedirs("/usr/local/promise")
+
+    hookenv.log('Downloading promise from github')
+    os.system("git clone https://github.com/opnfv/promise.git /usr/local/promise")
+    hookenv.log('setting up promise startup script')
+    os.system("cp ./hooks/promise-start /etc/init.d/promise && chmod 755 /etc/init.d/promise")
+    hookenv.log('setting up promise logrotation')
+    os.system("cp ./hooks/promise-logrotate /etc/logrotate.d/promise")
+
+def is_nodejs_installed():
+    hookenv.log('Checking installed nodejs version if any')
+    if os.system("which node") == 0:
+        if subprocess.check_output("which node", shell=True).strip() == "/usr/bin/node":
+            installed_node = subprocess.check_output('node -v 2>&1', shell=True).strip()
+            if StrictVersion(installed_node[1:]) > StrictVersion('0.10.25'):
+                hookenv.log('Installed nodejs is ' + installed_node + ' > v0.10.25. skipping nodejs 4 installation')
+                return True
+            else:
+                hookenv.log('Installed Nodejs is ' + installed_node + ' <= v0.10.25')
+                return False
+        else:
+            hookenv.log('Installed Nodejs path is not /usr/bin/node')
+            return False
+    else:
+        hookenv.log('Nodejs is not found under /usr/bin/node')
+        print('Nodejs is not found under /usr/bin/node')
+        return False
+
+def install_nodejs():
+    hookenv.log('Installing nodejs 4')
+    fetch.apt_install(fetch.filter_installed_packages(['curl']))
+    os.system('curl -sL https://deb.nodesource.com/setup_4.x | sudo -E bash -')
+    os.system('apt-get -y install nodejs')
+
+def is_npm_installed():
+    hookenv.log('Checking whether npm is installed or not')
+    if os.system("which npm") == 0:
+        if subprocess.check_output("which npm", shell=True).strip() == "/usr/bin/npm":
+            hookenv.log('npm is already installed')
+            return True
+        else:
+            hookenv.log('npm is not installed /usr/bin/npm')
+            return False
+    else:
+        hookenv.log('npm is not installed /usr/bin/npm')
+        return False
+
+def install_npm():
+    hookenv.log('Installing npm')
+    fetch.apt_install(fetch.filter_installed_packages(['npm']))
+
+def install_yangforge():
+    hookenv.log('Installing yangforge')
+    os.system('npm install -g yangforge')
+
+def verify_install():
+    node_version = subprocess.check_output("node -v 2>&1", shell=True).strip()
+    npm_version = subprocess.check_output("npm -v 2>&1", shell=True).strip()
+    yangforge_version = subprocess.check_output("yfc -V 2>&1", shell=True).strip()
+    hookenv.log('== Installed version ==')
+    hookenv.log('Nodejs :' + node_version)
+    hookenv.log('NPM: ' + npm_version)
+    hookenv.log('Yangforge: ' + yangforge_version)
+    hookenv.log('=======================')
+
+if __name__ == "__main__":
+    if is_nodejs_installed() is False:
+        install_nodejs()
+    if is_npm_installed() is False:
+        install_npm()
+    install_yangforge()
+    verify_install()
+    run_promise()

@@ -1,0 +1,114 @@
+#!/bin/bash
+# Written by Hironobu Maeda
+#
+# promise daemon
+# chkconfig: 345 20 80
+# description: promise daemon
+# processname: promise_daemon
+
+# source function library
+. /lib/lsb/init-functions
+
+set -e
+
+NAME="promise"
+
+export NODE_PATH=/usr/local/lib/node_modules/${NAME}/node_modules:/usr/local/lib/node_modules/${NAME}/lib
+PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin
+DAEMON_PATH="/usr/local/${NAME}"
+LOGDIR="/var/log/${NAME}"
+LOGFILE="${LOGDIR}/${NAME}.log"
+if [ -f /usr/local/bin/yfc ]; then
+    DAEMON="/usr/local/bin/yfc"
+else
+    DAEMON="/usr/bin/yfc"
+fi
+DAEMONOPTS="run opnfv-promise.yaml"
+
+PIDFILE=/var/run/$NAME.pid
+SCRIPTNAME=/etc/init.d/$NAME
+
+case "$1" in
+start)
+        printf "%-50s" "Starting $NAME..."
+        if [ -z "`/usr/bin/pgrep -xf "node ${DAEMON} ${DAEMONOPTS}"`" ]; then
+            [ -d "$LOGDIR" ] || mkdir -p $LOGDIR
+            cd $DAEMON_PATH
+            PID=`$DAEMON $DAEMONOPTS >> ${LOGFILE} 2>&1 & echo $!`
+            sleep 2
+            if [ -z $PID ] || [ -z "`ps axf | grep ${PID} | grep -v grep`" ]; then
+                printf "%s\n" "Fail"
+            else
+                echo $PID > $PIDFILE
+                printf "%s\n" "Ok"
+            fi
+         else
+            printf "%s\n" "Failed to start. Other Process still running"
+         fi
+;;
+status)
+        printf "%-50s" "Checking $NAME..."
+        if [ -f $PIDFILE ]; then
+            PID=`cat $PIDFILE`
+            if [ -z "`ps axf | grep ${PID} | grep -v grep`" ]; then
+                printf "%s\n" "Process dead but pidfile exists"
+            else
+                echo "Running"
+            fi
+        else
+            printf "%s\n" "Service not running"
+        fi
+;;
+stop)
+        printf "%-50s" "Stopping $NAME"
+        cd $DAEMON_PATH
+        if [ -f $PIDFILE ]; then
+            PID=`cat $PIDFILE`
+            if [ -z "`/usr/bin/pgrep -P $PID`" ]; then
+                if [ -z "`/usr/bin/pgrep -xf "node ${DAEMON} ${DAEMONOPTS}"`" ]; then
+                    printf "%s\n" "Ok"
+                    rm -f $PIDFILE
+                else
+                    kill -9 `/usr/bin/pgrep -xf "node ${DAEMON} ${DAEMONOPTS}"`
+                    sleep 3
+                    if [ -z "`/usr/bin/pgrep -xf "node ${DAEMON} ${DAEMONOPTS}"`" ]; then
+                        printf "%s\n" "Ok"
+                        rm -f $PIDFILE
+                    else
+                        printf "%s\n" "Failed to kill. Process still running and pidfile exists"
+                    fi
+                fi
+            else
+                if [ -z "`/usr/bin/pgrep -xf "node ${DAEMON} ${DAEMONOPTS}"`" ]; then
+                    printf "%s\n" "Ok"
+                    rm -f $PIDFILE
+                else
+                    kill -9 `/usr/bin/pgrep -xf "node ${DAEMON} ${DAEMONOPTS}"`
+                    printf "%s\n" "Ok"
+                    rm -f $PIDFILE
+                fi
+            fi
+        else
+            if [ -z "`/usr/bin/pgrep -xf "node ${DAEMON} ${DAEMONOPTS}"`" ]; then
+                printf "%s\n" "Ok"
+            else
+                kill -9 `/usr/bin/pgrep -xf "node ${DAEMON} ${DAEMONOPTS}"`
+                sleep 3
+                if [ -z "`/usr/bin/pgrep -xf "node ${DAEMON} ${DAEMONOPTS}"`" ]; then
+                    printf "%s\n" "Ok"
+                else
+                    printf "%s\n" "Failed to kill. Process still running"
+                fi
+            fi
+        fi
+;;
+
+restart)
+        $0 stop
+        $0 start
+;;
+
+*)
+        echo "Usage: $0 {status|start|stop|restart}"
+        exit 1
+esac
