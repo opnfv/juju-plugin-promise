@@ -1,12 +1,8 @@
-name: yangforge
-summary: YangForge provides runtime JavaScript execution
+name: juju-plugin-promise
+summary: Promise Juju Plugin
 maintainer: hironobu maeda <hmaeda@clearpathnet.com>
 description: |
-  Basically, the framework enables YANG schema language to become a programming language.
-  It also utilizes YAML with custom tags to construct a portable module with embedded code.
-  It is written primarily using CoffeeScript and runs on Node.js and the web browser (yes, it's isomorphic).
-  This software is sponsored by ClearPath Networks on behalf of the OPNFV (Open Platform for Network Functions Virtualization) community. For a reference implementation created entirely utilizing YangForge, please take a look at OPNFV Promise which provides future resource/capacity management (reservations/allocations) for virtualized infrastructure.
-  Please note that this project is under active development. Be sure to check back often as new updates are being pushed regularly.
+  Enable Juju based OpenStack to use OPNFV Promise
 categories:
   - app-servers
   - security

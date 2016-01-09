@@ -1,278 +1,141 @@
-# yfc -- YangForge Controller
+Promise Juju charm
+============
 
-[![Join the chat at https://gitter.im/saintkepha/yangforge](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/saintkepha/yangforge?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+Plugin description
 
-`yfc` is the command shell for the YangForge framework, providing
-schema-driven application lifecycle management.
+# opnfv-promise -- Resource Management for Virtual Infrastructure
 
-`YangForge` provides runtime JavaScript execution based on YANG schema
-modeling language as defined in IETF drafts and standards
-([RFC 6020](http://tools.ietf.org/html/rfc6020)).
+This module presents collection of Virtual Infrastructure Manager
+resource entity data models as defined under guidance of [OPNFV
+Promise](http://wiki.opnfv.org/promise) project.
 
-  [![NPM Version][npm-image]][npm-url]
-  [![NPM Downloads][downloads-image]][downloads-url]
-  
-  [![NPM][history-image]][history-url]
+`opnfv-promise` is built on top of the
+[YangForge](http://github.com/opnfv/yangforge) data modeling
+framework. You will need to first install `yangforge` and use the
+provided `yfc` command line utility to run this module.
 
-Basically, the framework enables YANG schema language to *become* a
-**programming** language.
+The following are the key features provided by this module:
 
-It also utilizes YAML with custom tags to construct a portable module
-with embedded code.
-
-It is written primarily using [CoffeeScript](http://coffeescript.org)
-and runs on [Node.js](http://nodejs.org) and the **web browser** (yes, it's isomorphic).
-
-This software is **sponsored** by
-[ClearPath Networks](http://www.clearpathnet.com) on behalf of the
-[OPNFV](http://opnfv.org) (Open Platform for Network Functions
-Virtualization) community. For a reference implementation created entirely utilizing `YangForge`, please take a look at [OPNFV Promise](http://github.com/opnfv/promise) which provides future resource/capacity management (reservations/allocations) for virtualized infrastructure.
-
-Please note that this project is under **active development**. Be sure
-to check back often as new updates are being pushed regularly.
+* Resource Capacity Management
+* Resource Reservation
+* Resource Allocation
 
 ## Installation
-```bash
-$ npm install -g yangforge
-```
 
-You must have `node >= 0.10.28` as a minimum requirement to run
-`yangforge`.
+Utilizing the latest `YangForge` 0.10.x framework, there is no longer
+a need to perform an `install` of this module. You simply need to
+*point* `yfc` to retrieve/run assets from this repository.
 
 ## Usage
-```
-  Usage: yfc [options] [command]
-
-
-  Commands:
-
-    build [options] [file]      package the application for deployment
-    config                      manage yangforge service configuration (planned)
-    deploy                      deploy application into yangforge endpoint (planned)
-    info [options] [name]       shows info about a specific module
-    publish [options]           publish package to upstream registry (planned)
-    run [options] [modules...]  runs one or more modules and/or schemas
-    schema [options] [file]     process a specific YANG schema file or string
-    sign                        sign package to ensure authenticity (planned)
-
-  YANG driven JS application builder
-
-  Options:
-
-    -h, --help     output usage information
-    -V, --version  output the version number
-    --no-color     disable color output
-```
-
-The `yfc` command-line interface is **runtime-generated** according to
-[yangforge.yang](yangforge.yang) schema definitions.  Please refer to
-the schema section covering various `rpc` extension statements and
-sub-statement definitions for a reference regarding different types of
-command-line arguments, descriptions, and options processing syntax.
-The corresponding **actions** for each of the `rpc` extensions are
-implemented inside the `YangForge` YAML module
-[package.yaml](package.yaml).
-
-For comprehensive **usage documentation** around various CLI commands,
-please refer to the [YangForge Examples README](examples#readme).
-
-## Troubleshooting
-
-When you encounter errors or issues while utilizing the `yfc` command
-line utility, you can set ENVIRONMENTAL variable `yfc_debug=1` to get
-complete debug output of the `YangForge` execution log.
-
 ```bash
-$ yfc_debug=1 yfc <some-command>
+$ yfc run github:opnfv/master/opnfv-promise.yaml
 ```
 
-The output generated is very verbose and may or may not assist you in
-determining the root cause. However, when reporting an issue into the
-Github repository, it will be helpful to paste a snippet of the debug
-output for quicker resolution by the project maintainer.
+The `yfc run` command will download/retrieve the primary application
+package from the Github repository along with any other dependency
+files/assets referenced within the YAML manifest and instantiate the
+opnfv-promise module and run REST/JSON interface by default listening
+on port 5000.
 
-## Bundled YANG schema modules
+You can also checkout this GIT repository or simply download the files
+into your local system and run the application.
 
-There are a number of YANG schema modules commonly referenced and
-utilized by other YANG modules during schema definition and they have
-been *bundled* together into the `yangforge` package for convenience.
-All you need to do is to `import <module name>` from your YANG schema
-and they will be retrieved/resolved automatically.
+## Primary YANG Data Models
 
-name | description | reference
+name | description | status
 --- | --- | ---
-[complex-types](core/complex-types.yang) | extensions to model complex types and typed instance identifiers | RFC-6095
-[iana-crypt-hash](core/iana-crypt-hash.yang) | typedef for storing passwords using a hash function | RFC-7317
-[ietf-inet-types](core/ietf-inet-types.yang) | collection of generally useful types for Internet addresses | RFC-6991
-[ietf-yang-types](core/ietf-yang-types.yang) | collection of generally useful derived data types | RFC-6991
+[opnfv-promise](opnfv-promise.yang) | provide resource reservation and capacity management | 95% complete
+[nfv-infrastructure](nfv-infrastructure.yang) | common NFV Infrastructure resource models | 80% complete
+[nfv-mano](nfv-mano.yang) | common NFV MANO resource models including VIM | 20% complete
+[openstack](openstack.yang) | openstack specific VIM extensions | 50% complete
 
-Additional YANG modules will be bundled into the `yangforge` package
-over time. Since `yangforge` facilitate *forging* of new YANG modules
-and easily using them in your own projects, only industry standards
-based YANG schema modules will be considered for native bundling at
-this time.
+## Promise Information Models
 
-## Bundled YANG features
+### ResourceReservation
 
-name | description | dependency
---- | --- | ---
-[cli](features/cli.coffee) | generates command-line interface | none
-[express](features/express.coffee) | generates HTTP/HTTPS web server instance | none
-[restjson](features/restjson.coffee) | generates REST/JSON web services interface | express
-[websocket](features/websocket.coffee) | generates socket.io interface | express
+The data model describing the required parameters regarding a resource
+reservation. The schema definition expressed in Yang can be found
+[here](opnfv-promise.yang).
 
-You can click on the *name* entry above for reference documentation on
-each feature module.
+#### Key Elements
 
-## Using YangForge Programmatically
+Name | Type | Description
+---  | ---  | ---
+start | ys:date-and-time | Timestamp of when the consumption of reserved resources can begin
+end   | ys:date-and-time | Timestamp of when the consumption of reserved resource must end
+expiry | number | Duration expressed in seconds since `start` when resource not yet allocated shall be released back to the available zone
+zone | nfvi:AvailabilityZone | Reference to a zone where the resources will be reserved
+capacity | object | Quantity of resources to be reserved per resource types
+attributes | list | References to resource attributes needed for reservation
+resources | list (nfvi:ResourceElement) | Reference to a collection of existing resource elements required
 
-```coffeescript
-forge = require 'yangforge'
-forge.import 'my-cool-schema.yang'
-.then (app) ->
-  console.log app.info()
-```
+#### State Elements (read-only)
 
-### Key Features
+State Elements are available as part of lookup response about the data model.
 
-* **Parse** YAML/YANG/JSON schema files and generate runtime
-  JavaScript semantic object tree hierarchy
-* **Import/Export** capabilities to load modules using customizable
-  importers based on regular expressions and custom import
-  routines. Ability to serialize module meta data into JSON format
-  that is portable across systems. Also exports serialized JS
-  functions as part of export meta data.
-* **Runtime Generation** allows compiler to directly create a live JS
-  class object definition so that it can be instantiated via `new`
-  keyword and used immediately
-* **Dynamic Extensions** enable compiler to be configured with
-  alternative `resolver` functions to change the behavior of produced
-  output
+Name | Type | Description
+---  | ---  | ---
+provider | nfvi:ResourceProvider | Reference to a specific provider when reservation service supports multiple providers
+remaining | object | Quantity of resources remaining for consumption based on consumed allocations
+allocations | list (nfvi:ResourceAllocation) | Reference to a collection of consumed allocations referencing this reservation
 
-[YangForge](src/forge.coffee) itself is also a YANG schema
-([yangforge.yang](./yangforge.yang)) **compiled** module. It is
-compiled by the [yang-compiler](src/compiler.litcoffee) and
-natively includes
-[yang-v1-extensions](core/yang-v1-extensions.yaml) submodule for
-supporting the YANG version 1.0
-([RFC 6020](http://tools.ietf.org/html/rfc6020)) specifications.
-Please reference the
-[yang-v1-extensions documentation](core/yang-v1-extensions.md) for
-up-to-date info on YANG 1.0 language coverage status. It serves as a
-good reference for writing new compilers, custom extensions, custom
-typedefs, among other things.
+#### Notification Elements
 
-### Primary interfaces
+Name | Type | Description
+---  | ---  | ---
+reservation-event | Event | Subscribers will be notified if the reservation encounters an error or other events
 
-name | description
---- | ---
-forge.import     | local/remote async loading of one or more modules using filenames
-forge.load       | local async/sync loading of module(s), only one-at-a-time with sync
-forge.compile    | local sync compilation of a module, generates class obj that can be instantiated
-forge.preprocess | local sync preprocessing of a module, constraint validations, schema manipulations
-forge.parse      | local sync parsing of a module, syntax validations, custom-tag resolutions
+#### Inherited Elements
 
-### Programmatic Usage Examples
+##### Extended from [nfvi:ResourceElement](nfv-infrastructure.yang)
 
-The below examples can be executed using CoffeeScript REPL by running
-`coffee` at the command-line from the top-directory of this repo.
+Name | Type | Description
+---  | ---  | ---
+id | yang:uuid | A GUID identifier for the data model (usually auto-generated, but can also be specified)
+name | string | Name of the data model
+enabled | boolean | Enable/Disable the data model
+protected | boolean | Prevent model from being destroyed when protected
+owner | nfvi:AccessIdentity | An owner for the data model
+visibility | enumeration | Visibility level of the given data model
+tags | list (string) | List of string tags for query/filter
+members | list (nfvi:AccessIdentity) | List of additional AccessIdentities that can operate on the data model
 
-Using the native YangForge module as a library:
+### Resource Allocation
 
-```coffeescript
-forge = require 'yangforge'
+The data model describing the required parameters regarding a resource
+allocation.  The schema definition expressed in YANG can be found
+[here](opnfv-promise.yang).
 
-yang = """
-  module hello-world {
-    description "a test";
-    leaf hello { type string; default "world"; }
-  }
-  """
+#### Key Elements
 
-# asynchronous load YANG schema
-forge.load schema: yang
-.then (app) ->
-  console.log app.get 'hello-world.hello'
-  app.set 'hello-world.hello', 'goodbye'
-  console.log app.get()
+Name | Type | Description
+---  | ---  | ---
+reservation | nfvi:ResourceReservation | Reference to an existing reservation identifier
+allocate-on-start | boolean | Specify whether the allocation can take effect automatically upon reservation 'start'
+resources | list (nfvi:ResourceElement) | Reference to a collection of new resource elements to be allocated
 
-# synchronous load YANG schema
-app = forge.load schmea: yang, async: false
-console.log app.info format: 'json'
+#### State Elements (read-only)
 
-# compile YANG schema model as class object
-HelloWorld = forge.compile schema: yang
-hello = new HelloWorld 'hello-world': hello: 'howdy there'
-console.log hello.get()
+Name | Type | Description
+---  | ---  | ---
+priority | number | Read-only state information about the priority classification of the reservation
 
-yaml = """
-  name: hello
-  schema: !yang |
-    module embedded-world { leaf wow { type number; default 0; } }
-  config: !json |
-    { "embedded-world": { "wow": 2 } }
-  """
+#### Inherited Elements
 
-# it can do YAML quite well
-forge.load yaml
-.then (app) ->
-  console.log app.get()
+##### Extended from [nfvi:ResourceElement](nfv-infrastructure.yang)
 
-# sometimes you just want to preprocess to see what it becomes
-console.log forge.preprocess yaml
-```
-
-Forging a new module/application for build/publish using YAML
-(see also [complex-types](core/complex-types.yaml)):
-```coffeescript
-name: some-new-application
-schema: !yang some-new-application.yang
-rpc:
-  something-useful: !coffee/function
-    (input, output, done) ->
-	  console.log input.get()
-	  output.set 'important data'
-	  done()
-```
-
-Forging a new interface generator using YAML (see also
-[cli example](features/cli.yaml)):
-```yaml
-name: some-new-interface
-description: Some new awesome interface
-run: !coffee/function
-  (model, options) ->
-    # code logic to dynamically construct a new interface based on passed-in context
-    console.log model
-```
-
-There are many other ways of interacting with the module's class
-object as well as the instantiated class.
-
-**More examples coming soon!**
-
-## Literate CoffeeScript Documentation
-
-The source code is documented in Markdown format. It's code combined
-with documentation all-in-one.
-
-* [YangForge](src/forge.coffee)
-  * [Compiler](src/compiler.litcoffee)
-  * [Features](features)
-  * [Module](package.yaml)
-  * [Schema](yangforge.yang)
-* External Dependencies
-  * [data-synth library](http://github.com/saintkepha/data-synth)
-  * [js-yaml library](https://github.com/nodeca/js-yaml)
-  * [yang-parser library](https://gitlab.labs.nic.cz/labs/yang-tools/wikis/coffee_parser)
+Name | Type | Description
+---  | ---  | ---
+id | yang:uuid | A GUID identifier for the data model (usually auto-generated, but can also be specified)
+name | string | Name of the data model
+enabled | boolean | Enable/Disable the data model
+protected | boolean | Prevent model from being destroyed when protected
+owner | nfvi:AccessIdentity | An owner for the data model
+visibility | enumeration | Visibility level of the given data model
+tags | list (string) | List of string tags for query/filter
+members | list (nfvi:AccessIdentity) | List of additional AccessIdentities that can operate on the data model
 
 ## License
-  [Apache 2.0](LICENSE)
+  [Apache-2.0](LICENSE)
 
-[npm-image]: https://img.shields.io/npm/v/yangforge.svg
-[npm-url]: https://npmjs.org/package/yangforge
-[downloads-image]: https://img.shields.io/npm/dm/yangforge.svg
-[downloads-url]: https://npmjs.org/package/yangforge
-[history-image]: https://nodei.co/npm-dl/yangforge.png?height=3
-[history-url]: https://nodei.co/npm/yangforge
 
