@@ -23,7 +23,7 @@ if [ -f /usr/local/bin/yfc ]; then
 else
     DAEMON="/usr/bin/yfc"
 fi
-DAEMONOPTS="run opnfv-promise.yaml"
+DAEMONOPTS="run promise.yaml"
 
 PIDFILE=/var/run/$NAME.pid
 SCRIPTNAME=/etc/init.d/$NAME
