@@ -1,4 +1,4 @@
-name: juju-plugin-promise
+name: promise
 summary: Promise Juju Plugin
 maintainer: hironobu maeda <hmaeda@clearpathnet.com>
 description: |
