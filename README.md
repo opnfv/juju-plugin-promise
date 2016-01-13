@@ -28,14 +28,19 @@ a need to perform an `install` of this module. You simply need to
 
 ## Usage
 ```bash
-$ yfc run github:opnfv/master/opnfv-promise.yaml
+To run promise plugin manually:
+$ cd /usr/local/promise
+$ nohup yfc run --express 5050 promise.yaml > /var/log/promise.log &
+
+To run it via INIT script:
+/etc/init.d/promise start
 ```
 
 The `yfc run` command will download/retrieve the primary application
 package from the Github repository along with any other dependency
 files/assets referenced within the YAML manifest and instantiate the
 opnfv-promise module and run REST/JSON interface by default listening
-on port 5000.
+on port 5050.
 
 You can also checkout this GIT repository or simply download the files
 into your local system and run the application.
@@ -137,5 +142,3 @@ members | list (nfvi:AccessIdentity) | List of additional AccessIdentities that 
 
 ## License
   [Apache-2.0](LICENSE)
-
-
