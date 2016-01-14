@@ -1,4 +1,4 @@
-name: promise
+name: opnfv-promise
 summary: Promise Juju Plugin
 maintainer: hironobu maeda <hmaeda@clearpathnet.com>
 description: |
