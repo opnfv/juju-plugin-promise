@@ -35,7 +35,7 @@ Promise plugin installation
         
 2. Clone the juju-plugin-promise repo from github:
 
-        git clone  https://github.com/opnfv/juju-plugin-promise.git opnvpn-promise
+        git clone  https://github.com/opnfv/juju-plugin-promise.git opnfv-promise
 
 3. Prepare Juju local environment:
 
